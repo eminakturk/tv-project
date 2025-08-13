@@ -1,3 +1,106 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
 #root {
-  color: red;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #1a1a1a;
+  color: white;
+  border-radius: 5px;
+}
+
+header h1 {
+  margin-bottom: 10px;
+}
+
+.attribution {
+  font-size: 0.9rem;
+}
+
+.attribution a {
+  color: #e0e0e0;
+  text-decoration: none;
+}
+
+.attribution a:hover {
+  text-decoration: underline;
+}
+
+.episode-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.episode-card {
+  background-color: white;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.episode-card:hover {
+  transform: translateY(-5px);
+}
+
+.episode-header {
+  padding: 15px;
+  background-color: #2c3e50;
+  color: white;
+}
+
+.episode-header h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.episode-content {
+  padding: 15px;
+}
+
+.episode-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 15px;
+  border-radius: 3px;
+}
+
+.episode-summary {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.episode-summary p {
+  margin: 0;
+}
+
+.episode-link {
+  display: inline-block;
+  color: #2c3e50;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px 0;
+}
+
+.episode-link:hover {
+  text-decoration: underline;
 }
