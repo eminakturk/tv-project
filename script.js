@@ -1,7 +1,9 @@
 let allEpisodes = [];
 let filteredEpisodes = [];
 let allShows = [];
+let filteredShows = [];
 let currentShow = null;
+let currentView = 'shows';
 let cache = {
   shows: null,
   episodes: {}
@@ -64,13 +66,9 @@ async function fetchEpisodes(showId) {
 async function setup() {
   try {
     allShows = await fetchShows();
+    filteredShows = allShows;
     createPageStructure();
-    
-    const defaultShow = allShows.find(show => show.id === 82) || allShows[0];
-    if (defaultShow) {
-      document.getElementById("show-select").value = defaultShow.id;
-      await loadShow(defaultShow.id);
-    }
+    showShowsListing();
   } catch (error) {
     console.error('Setup failed:', error);
   }
@@ -82,10 +80,11 @@ async function loadShow(showId) {
     if (!show) return;
     
     currentShow = show;
+    currentView = 'episodes';
     allEpisodes = await fetchEpisodes(showId);
     filteredEpisodes = allEpisodes;
     
-    updatePageTitle();
+    showEpisodesListing();
     updateEpisodeSelector();
     makePageForEpisodes(filteredEpisodes);
     updateEpisodeCount();
@@ -93,13 +92,6 @@ async function loadShow(showId) {
     document.getElementById("search-input").value = "";
   } catch (error) {
     console.error('Failed to load show:', error);
-  }
-}
-
-function updatePageTitle() {
-  const titleElement = document.querySelector(".page-title");
-  if (titleElement && currentShow) {
-    titleElement.textContent = `${currentShow.name} - Episodes`;
   }
 }
 
@@ -133,28 +125,18 @@ function createPageStructure() {
   header.className = "header";
 
   const title = document.createElement("h1");
-  title.textContent = "TV Show Episodes";
+  title.textContent = "TV Show Browser";
   title.className = "page-title";
 
-  const showSection = document.createElement("div");
-  showSection.className = "show-section";
+  const navigation = document.createElement("div");
+  navigation.className = "navigation";
   
-  const showSelect = document.createElement("select");
-  showSelect.id = "show-select";
-  showSelect.className = "show-select";
-  showSelect.addEventListener("change", handleShowSelect);
-  
-  const defaultShowOption = document.createElement("option");
-  defaultShowOption.value = "";
-  defaultShowOption.textContent = "Select a TV show...";
-  showSelect.appendChild(defaultShowOption);
-  
-  allShows.forEach(show => {
-    const option = document.createElement("option");
-    option.value = show.id;
-    option.textContent = show.name;
-    showSelect.appendChild(option);
-  });
+  const backToShowsBtn = document.createElement("button");
+  backToShowsBtn.id = "back-to-shows";
+  backToShowsBtn.className = "nav-button";
+  backToShowsBtn.textContent = "← Back to Shows";
+  backToShowsBtn.style.display = "none";
+  backToShowsBtn.addEventListener("click", showShowsListing);
 
   const searchSection = document.createElement("div");
   searchSection.className = "search-section";
@@ -163,11 +145,12 @@ function createPageStructure() {
   searchInput.type = "text";
   searchInput.id = "search-input";
   searchInput.className = "search-input";
-  searchInput.placeholder = "Search episodes by name or summary...";
+  searchInput.placeholder = "Search shows or episodes...";
   searchInput.addEventListener("input", handleSearch);
 
   const selectorSection = document.createElement("div");
   selectorSection.className = "selector-section";
+  selectorSection.style.display = "none";
 
   const episodeSelect = document.createElement("select");
   episodeSelect.id = "episode-select";
@@ -178,20 +161,43 @@ function createPageStructure() {
   episodeCount.id = "episode-count";
   episodeCount.className = "episode-count";
 
-  const episodeContainer = document.createElement("div");
-  episodeContainer.className = "episode-container";
+  const contentContainer = document.createElement("div");
+  contentContainer.id = "content-container";
+  contentContainer.className = "content-container";
 
   header.appendChild(title);
-  showSection.appendChild(showSelect);
+  navigation.appendChild(backToShowsBtn);
   searchSection.appendChild(searchInput);
   selectorSection.appendChild(episodeSelect);
 
   rootElem.appendChild(header);
-  rootElem.appendChild(showSection);
+  rootElem.appendChild(navigation);
   rootElem.appendChild(searchSection);
   rootElem.appendChild(selectorSection);
   rootElem.appendChild(episodeCount);
-  rootElem.appendChild(episodeContainer);
+  rootElem.appendChild(contentContainer);
+}
+
+function showShowsListing() {
+  currentView = 'shows';
+  
+  document.querySelector(".page-title").textContent = "TV Show Browser";
+  document.getElementById("back-to-shows").style.display = "none";
+  document.querySelector(".selector-section").style.display = "none";
+  document.getElementById("episode-count").style.display = "none";
+  document.getElementById("search-input").placeholder = "Search shows by name, genre, or summary...";
+  
+  makePageForShows(filteredShows);
+}
+
+function showEpisodesListing() {
+  currentView = 'episodes';
+  
+  document.querySelector(".page-title").textContent = `${currentShow.name} - Episodes`;
+  document.getElementById("back-to-shows").style.display = "block";
+  document.querySelector(".selector-section").style.display = "block";
+  document.getElementById("episode-count").style.display = "block";
+  document.getElementById("search-input").placeholder = "Search episodes by name or summary...";
 }
 
 async function handleShowSelect(event) {
@@ -205,20 +211,34 @@ async function handleShowSelect(event) {
 function handleSearch(event) {
   const searchTerm = event.target.value.toLowerCase().trim();
 
-  if (searchTerm === "") {
-    filteredEpisodes = allEpisodes;
+  if (currentView === 'shows') {
+    if (searchTerm === "") {
+      filteredShows = allShows;
+    } else {
+      filteredShows = allShows.filter((show) => {
+        const nameMatch = show.name.toLowerCase().includes(searchTerm);
+        const summaryMatch = show.summary && show.summary.toLowerCase().includes(searchTerm);
+        const genresMatch = show.genres && show.genres.some(genre => 
+          genre.toLowerCase().includes(searchTerm)
+        );
+        return nameMatch || summaryMatch || genresMatch;
+      });
+    }
+    makePageForShows(filteredShows);
   } else {
-    filteredEpisodes = allEpisodes.filter((episode) => {
-      const nameMatch = episode.name.toLowerCase().includes(searchTerm);
-      const summaryMatch = episode.summary.toLowerCase().includes(searchTerm);
-      return nameMatch || summaryMatch;
-    });
+    if (searchTerm === "") {
+      filteredEpisodes = allEpisodes;
+    } else {
+      filteredEpisodes = allEpisodes.filter((episode) => {
+        const nameMatch = episode.name.toLowerCase().includes(searchTerm);
+        const summaryMatch = episode.summary.toLowerCase().includes(searchTerm);
+        return nameMatch || summaryMatch;
+      });
+    }
+    makePageForEpisodes(filteredEpisodes);
+    updateEpisodeCount();
+    document.getElementById("episode-select").value = "";
   }
-
-  makePageForEpisodes(filteredEpisodes);
-  updateEpisodeCount();
-
-  document.getElementById("episode-select").value = "";
 }
 
 function handleEpisodeSelect(event) {
@@ -262,28 +282,36 @@ function updateEpisodeCount() {
   }
 }
 
-function makePageForEpisodes(episodeList) {
-  let episodeContainer = document.querySelector(".episode-container");
-  if (episodeContainer) {
-    episodeContainer.innerHTML = "";
-  } else {
-    episodeContainer = document.createElement("div");
-    episodeContainer.className = "episode-container";
-    document.getElementById("root").appendChild(episodeContainer);
-  }
+function makePageForShows(showList) {
+  const contentContainer = document.getElementById("content-container");
+  contentContainer.innerHTML = "";
+  contentContainer.className = "shows-container";
 
-  for (let episode of episodeList) {
-    const episodeCode = `S${String(episode.season).padStart(2, "0")}E${String(
-      episode.number
-    ).padStart(2, "0")}`;
-    const episodeDiv = document.createElement("div");
-    episodeDiv.className = "episode-card";
-    episodeDiv.innerHTML = `
-      <h2 class="episode-title">${episodeCode} - ${episode.name}</h2>
-      <img src="${episode.image.medium}" alt="${episode.name}" class="episode-image">
-      <div class="episode-summary">${episode.summary}</div>
+  for (let show of showList) {
+    const showDiv = document.createElement("div");
+    showDiv.className = "show-card";
+    showDiv.addEventListener("click", () => loadShow(show.id));
+    
+    const imageUrl = show.image ? show.image.medium : 'https://via.placeholder.com/210x295?text=No+Image';
+    const rating = show.rating && show.rating.average ? show.rating.average : 'N/A';
+    const genres = show.genres ? show.genres.join(', ') : 'Unknown';
+    const status = show.status || 'Unknown';
+    const runtime = show.runtime ? `${show.runtime} min` : 'Unknown';
+    
+    showDiv.innerHTML = `
+      <img src="${imageUrl}" alt="${show.name}" class="show-image">
+      <div class="show-info">
+        <h2 class="show-title">${show.name}</h2>
+        <div class="show-meta">
+          <span class="show-rating">★ ${rating}</span>
+          <span class="show-status">${status}</span>
+          <span class="show-runtime">${runtime}</span>
+        </div>
+        <div class="show-genres">${genres}</div>
+        <div class="show-summary">${show.summary || 'No summary available.'}</div>
+      </div>
     `;
-    episodeContainer.appendChild(episodeDiv);
+    contentContainer.appendChild(showDiv);
   }
 
   let credits = document.querySelector(".credits");
@@ -292,6 +320,28 @@ function makePageForEpisodes(episodeList) {
     credits.className = "credits";
     credits.innerHTML = `Data originally sourced from <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a>`;
     document.getElementById("root").appendChild(credits);
+  }
+}
+
+function makePageForEpisodes(episodeList) {
+  const contentContainer = document.getElementById("content-container");
+  contentContainer.innerHTML = "";
+  contentContainer.className = "episode-container";
+
+  for (let episode of episodeList) {
+    const episodeCode = `S${String(episode.season).padStart(2, "0")}E${String(
+      episode.number
+    ).padStart(2, "0")}`;
+    const episodeDiv = document.createElement("div");
+    episodeDiv.className = "episode-card";
+    const imageUrl = episode.image ? episode.image.medium : 'https://via.placeholder.com/295x166?text=No+Image';
+    
+    episodeDiv.innerHTML = `
+      <h2 class="episode-title">${episodeCode} - ${episode.name}</h2>
+      <img src="${imageUrl}" alt="${episode.name}" class="episode-image">
+      <div class="episode-summary">${episode.summary}</div>
+    `;
+    contentContainer.appendChild(episodeDiv);
   }
 }
 

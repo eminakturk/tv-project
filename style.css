@@ -40,6 +40,30 @@ body {
   margin-bottom: 0.5rem;
 }
 
+/* Navigation styles */
+.navigation {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.nav-button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
 /* Search section styles */
 .search-section {
   margin-bottom: 1.5rem;
@@ -139,6 +163,94 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
   margin-bottom: 2rem;
+}
+
+/* Shows container styles */
+.shows-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Show card styles */
+.show-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #eee;
+  cursor: pointer;
+}
+
+.show-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.show-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.show-card:hover .show-image {
+  transform: scale(1.02);
+}
+
+.show-info {
+  padding: 1.5rem;
+}
+
+.show-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.show-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.show-rating {
+  color: #f39c12;
+  font-weight: 600;
+}
+
+.show-status {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.show-runtime {
+  color: #8e44ad;
+  font-weight: 600;
+}
+
+.show-genres {
+  font-size: 0.9rem;
+  color: #667eea;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.show-summary {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #555;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* Episode card styles */
@@ -282,7 +394,6 @@ body {
   }
 }
 
-/* Highlight search terms (if you want to add this feature later) */
 .highlight {
   background-color: yellow;
   font-weight: bold;
