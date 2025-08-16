@@ -7,15 +7,17 @@
     <link href="style.css" rel="stylesheet" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   </head>
-
   <body>
     <div id="root">
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search episodes..." />
+        <select id="episodeSelect">
+          <option value="">Select an episode</option>
+        </select>
+        <p id="episodeCount">0 episodes displayed</p>
+      </div>
     </div>
-
-    <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
     <script src="episodes.js"></script>
-
-    <!-- Loads YOUR javascript code -->
     <script src="script.js"></script>
   </body>
 </html>
