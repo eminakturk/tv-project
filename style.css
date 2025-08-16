@@ -104,3 +104,32 @@ header h1 {
 .episode-link:hover {
   text-decoration: underline;
 }
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+#searchInput {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 200px;
+}
+
+#episodeSelect {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  min-width: 200px;
+}
+
+#episodeCount {
+  font-size: 0.9rem;
+  color: #555;
+}
