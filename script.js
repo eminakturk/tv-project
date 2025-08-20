@@ -148,9 +148,23 @@ function createPageStructure() {
   searchInput.placeholder = "Search shows or episodes...";
   searchInput.addEventListener("input", handleSearch);
 
-  const selectorSection = document.createElement("div");
-  selectorSection.className = "selector-section";
-  selectorSection.style.display = "none";
+  const showSelectorSection = document.createElement("div");
+  showSelectorSection.className = "show-selector-section";
+  
+  const showSelect = document.createElement("select");
+  showSelect.id = "show-select";
+  showSelect.className = "show-select";
+  showSelect.addEventListener("change", handleShowSelect);
+  
+  const clearFiltersBtn = document.createElement("button");
+  clearFiltersBtn.id = "clear-filters";
+  clearFiltersBtn.className = "clear-filters-btn";
+  clearFiltersBtn.textContent = "Show All";
+  clearFiltersBtn.addEventListener("click", clearAllFilters);
+
+  const episodeSelectorSection = document.createElement("div");
+  episodeSelectorSection.className = "episode-selector-section";
+  episodeSelectorSection.style.display = "none";
 
   const episodeSelect = document.createElement("select");
   episodeSelect.id = "episode-select";
@@ -168,12 +182,17 @@ function createPageStructure() {
   header.appendChild(title);
   navigation.appendChild(backToShowsBtn);
   searchSection.appendChild(searchInput);
-  selectorSection.appendChild(episodeSelect);
+  
+  showSelectorSection.appendChild(showSelect);
+  showSelectorSection.appendChild(clearFiltersBtn);
+  
+  episodeSelectorSection.appendChild(episodeSelect);
 
   rootElem.appendChild(header);
   rootElem.appendChild(navigation);
   rootElem.appendChild(searchSection);
-  rootElem.appendChild(selectorSection);
+  rootElem.appendChild(showSelectorSection);
+  rootElem.appendChild(episodeSelectorSection);
   rootElem.appendChild(episodeCount);
   rootElem.appendChild(contentContainer);
 }
@@ -181,12 +200,17 @@ function createPageStructure() {
 function showShowsListing() {
   currentView = 'shows';
   
+  filteredShows = allShows;
+  document.getElementById("search-input").value = "";
+  
   document.querySelector(".page-title").textContent = "TV Show Browser";
   document.getElementById("back-to-shows").style.display = "none";
-  document.querySelector(".selector-section").style.display = "none";
+  document.querySelector(".show-selector-section").style.display = "block";
+  document.querySelector(".episode-selector-section").style.display = "none";
   document.getElementById("episode-count").style.display = "none";
   document.getElementById("search-input").placeholder = "Search shows by name, genre, or summary...";
   
+  updateShowSelector();
   makePageForShows(filteredShows);
 }
 
@@ -195,7 +219,8 @@ function showEpisodesListing() {
   
   document.querySelector(".page-title").textContent = `${currentShow.name} - Episodes`;
   document.getElementById("back-to-shows").style.display = "block";
-  document.querySelector(".selector-section").style.display = "block";
+  document.querySelector(".show-selector-section").style.display = "none";
+  document.querySelector(".episode-selector-section").style.display = "block";
   document.getElementById("episode-count").style.display = "block";
   document.getElementById("search-input").placeholder = "Search episodes by name or summary...";
 }
@@ -205,6 +230,34 @@ async function handleShowSelect(event) {
   
   if (selectedShowId) {
     await loadShow(selectedShowId);
+  }
+}
+
+function updateShowSelector() {
+  const showSelect = document.getElementById("show-select");
+  if (!showSelect) return;
+  
+  showSelect.innerHTML = "";
+  
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "Select a show...";
+  showSelect.appendChild(defaultOption);
+
+  allShows.forEach((show) => {
+    const option = document.createElement("option");
+    option.value = show.id;
+    option.textContent = show.name;
+    showSelect.appendChild(option);
+  });
+}
+
+function clearAllFilters() {
+  if (currentView === 'shows') {
+    filteredShows = allShows;
+    document.getElementById("search-input").value = "";
+    document.getElementById("show-select").value = "";
+    makePageForShows(filteredShows);
   }
 }
 
